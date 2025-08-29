@@ -6,13 +6,12 @@ from src.classes.Cliente import Cliente
 # ===== Estruturas de dados =====
 produtos = []              # LISTA do estoque
 clientes = Cliente.carregar_todos()
-fila_vendas = deque()      # FILA de vendas (ordem de chegada) - agora inclui cliente_id
+fila_vendas = deque()      # FILA de vendas (ordem de chegada)
 pilha_desfazer = []        # PILHA para desfazer última operação
 
 def cls():
     time.sleep(0.4)
-    input("Pressione Enter para continuar")
-    os.system("CLS" if os.name == "nt" else "clear")
+    #os.system("CLS" if os.name == "nt" else "clear")
 
 # ---------- Persistência em TXT ----------
 def _garante_pasta():
@@ -41,7 +40,6 @@ def salvar_vendas_txt():
     _garante_pasta()
     with open("dados/vendas.txt", "w", encoding="utf-8") as f:
         for v in fila_vendas:
-            # Agora persistimos também o cliente_id (obrigatório)
             f.write(f'{v["produto_id"]};{v["nome"]};{v["quantidade"]};{v["valor_total"]};{v["cliente_id"]}\n')
 
 def carregar_vendas_txt():
@@ -55,7 +53,7 @@ def carregar_vendas_txt():
             if not linha:
                 continue
             partes = linha.split(";")
-            # Backcompat: se arquivo antigo (sem cliente_id), ignora a linha (ou trate como inválida)
+
             if len(partes) == 5:
                 pid, nome, qtd, vt, cid = partes
                 fila_vendas.append({
@@ -66,7 +64,6 @@ def carregar_vendas_txt():
                     "cliente_id": int(cid)
                 })
             else:
-                # se quiser aceitar arquivo antigo, poderia atribuir cliente_id=0; aqui vamos ignorar por segurança
                 continue
 
 def salvar_tudo():
@@ -202,7 +199,7 @@ def menu_estoque():
                     elif produto.quantidade < qtd:
                         print("Estoque insuficiente.")
                     else:
-                        # ---- ID do cliente: OBRIGATÓRIO ----
+                        # ---- ID do cliente ----
                         cid = int(input("Digite o ID do cliente: "))
                         cliente = encontrar_cliente_por_id(cid)
                         if not cliente:
@@ -211,7 +208,7 @@ def menu_estoque():
                             produto.quantidade -= qtd
                             valor_total = qtd * produto.preco
 
-                            # atualiza total gasto do cliente (obrigatório)
+                            # atualiza total gasto do cliente
                             cliente.registrar_compra(valor_total)
                             Cliente.salvar_todos(clientes)
 

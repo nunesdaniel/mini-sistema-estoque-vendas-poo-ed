@@ -15,7 +15,7 @@ class Cliente:
     def registrar_compra(self, valor: float) -> None:
         self.total_gasto += float(valor)
 
-    # -------- persistência ----------
+    # -------- persistindo ----------
     def _to_row(self):
         return [str(self.id), self.nome, f"{self.total_gasto:.2f}"]
 
@@ -42,7 +42,6 @@ class Cliente:
                     cid, nome, total = row
                     clientes.append(cls(int(cid), nome, float(total)))
                 except ValueError:
-                    # ignora linhas inválidas
                     continue
         return clientes
 
